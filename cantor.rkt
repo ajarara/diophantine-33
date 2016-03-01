@@ -38,10 +38,9 @@
 
 ;; actual test case
 
-(define test-results
+(define test-pair-results
   (map zombie-unit-test-pairing zombie-unit-test-pairing-vals))
 (define test-cantor-pairing
-  (if (memq #f test-results)
+  (if (memq #f test-pair-results)
       (display "Test failed! cantor-pairing did not display expected behavior!")))
-
 
