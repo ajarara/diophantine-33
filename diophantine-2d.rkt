@@ -44,6 +44,8 @@
 ;; save the results of the compare in a list
 ;; and check for inconsistent values
 ;; if there are any consistencies, print the message
+;; the samples should be a list with the input as
+;; the first 
 (define test
   (lambda (function samples diagnostic-message)
     (if (memq #f
@@ -53,7 +55,6 @@
 	            (= (apply function sample-input)
 		       sample-output))
 		   samples))
-	      
 	(lambda () ((newline) (display "TESTING ERROR: ") (display diagnostic-message) (newline) #f))
       #t)))
 
@@ -61,10 +62,11 @@
   (lambda ()
     (define samples
       `(((10 5) 15)
-	((22 -1) 21)
-	((1 1) 2)))
-    (test + samples "procedure test failed it's test! Madness.")))
+	((22 -1) 0)
+	((1 1) 4)))
+    (test + samples "procedure test failed its test! Madness.")))
 (test-test)
+
 
 
 ;; testing minimal-index-of-shell
@@ -75,6 +77,8 @@
 	`(2 7)
 	`(3 16)
 	`(4 29)))
+
+
 
 
 ;; testing maximal-index-of-shell
