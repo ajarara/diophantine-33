@@ -8,13 +8,16 @@
     2)
    tuple2))
 
-
-;; for n dimensions, given as a list, recursively defined. I'd love to change this into a wrapper for an iteration routine
-;; example usage (cantor-tuple `(5 0 3 5 7 4))
+;; given an arbitrary-sized list of natural numbers, return the index of it will occur in. Currently just a wrapper to the iterative proc defined a little ways below
 (define (cantor-tuple tuple)
+  (cantor-iter 0 tuple))
+
+;; for n dimensions, given as a list, recursively defined. 
+;; example usage (cantor-tuple `(5 0 3 5 7 4))
+(define (cantor-recur tuple)
   (if (null? (cdr tuple))
     (car tuple)
-    (cantor-pairing (cantor-tuple (cdr tuple)) (car tuple))))
+    (cantor-pairing (cantor-recur (cdr tuple)) (car tuple))))
 
 ;; iterative method, using invariant quantities and cobbled together dreams
 (define (cantor-iter rolling tuple)
