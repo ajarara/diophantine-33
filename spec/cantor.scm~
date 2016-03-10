@@ -1,4 +1,5 @@
 (load "../cantor.scm")
+(use-modules (ggspec lib))
 
 (suite "The sqr function"
        (tests
