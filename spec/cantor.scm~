@@ -1,8 +1,0 @@
-(load "../cantor.scm")
-(use-modules (ggspec lib))
-
-(suite "The sqr function"
-       (tests
-	(test "Should square 1 correctly"
-	      e
-	      (assert-equal 1 (sqr 1)))))

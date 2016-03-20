@@ -17,8 +17,7 @@
 ;; given a shell number, return the maximal index that is contained in it
 ;; usage (maximal-index-of-shell 3) => 28
 ;; 28 is given the coordinates (-3, -3) in this system of enumeration
-;; this is implemented directly as a result of minimal-index-of-shell, it can
-;; be implemented as it's own procedure, but I've got an 8:30 tomorrow.
+;; this is implemented directly as a result of minimal-index-of-shell
 (define maximal-index-of-shell
   (lambda (shell)
     (- (minimal-index-of-shell (1+ shell)) 1)))
@@ -26,14 +25,21 @@
 
 ;; given an index, determine the shell it's in
 ;; inverted functionality of minimal-index-of-shell
+;; indices start at 1, not 0.
 (define shell-of-index
   (lambda (index)
     (inexact->exact
-     (floor
+     (ceiling
       (* (/ 1 4)
 	 (- (sqrt (+ 1
 		     (* 8 index)))
 	    3))))))
 
-
-	
+;; small function to see if I can use the unceiling'd quantity to determine position
+;; within index
+(define tst
+  (lambda (index)
+    (* (/ 1 4)
+       (- (sqrt (+ 1
+                   (* 8 index)))
+          3))))
