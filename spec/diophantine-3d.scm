@@ -21,14 +21,14 @@
                                             ((10) (1 0 1))
                                             ((337500) (2 3 5)))))
                 (assert-false (memq #f (mapf pivot-list-of-index input-output-pairing)))))
-        (test "inc-3-pivot-list rvcwd"
+        (test "unopt-inc-3-pivot-list rvcwd"
               e
               (let ((input-output-pairing `(((2 1 1) (2 1 2))
                                             ((1 0 0) (1 0 1))
                                             ((0 0 0) (1 0 0))
                                             ((2 2 2) (3 0 0))
                                             ((3 0 3) (3 1 1)))))
-                (assert-false (memq #f (mapf increment-3-pivot-list input-output-pairing)))))
+                (assert-false (memq #f (mapf unopt-increment-3-pivot-list input-output-pairing)))))
         (test "diophantine-calculate rvcwd"
               e
               (let ((input-output-pairing `(((2 1 1) 10)
@@ -36,4 +36,16 @@
                                             ((1 1 1) 3)
                                             ((4 3 1) 92))))
                 (assert-false (memq #f (mapf dioph-calc input-output-pairing)))))
+        (test "inc-3-pivot-list exits with error on even pivot"
+              e
+              (assert-true (error? (increment-3-pivot-list 2 0 0))))
+        (test "inc-3-pivot-list rvcwd"
+              e
+              (let ((input-output-pairing `(((1 1 1) (3 2 2)) ;; testing jump to next pivot
+                                            ((3 1 1) (3 3 1)) ;; testing incrementation within the range of a given pivot
+                                            ((5 5 5) (7 2 2)) ;; testing jump to next pivot
+                                            ((5 1 1) (5 1 3)) ;; more regular incs
+                                            ((5 1 3) (5 1 5))
+                                            ((5 1 5) (5 3 3)))))
+                (assert-false (memq #f (mapf increment-3-pivot-list input-output-pairing)))))
         ))

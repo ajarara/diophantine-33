@@ -50,17 +50,59 @@
      (expt 3 2nd)
      (expt 5 3rd)))
 
-(define (increment-3-pivot-list pivot 2nd 3rd)
+;; given a number, return the associated pivot list in that order.
+(define (pivot-list-of-index index)
+  ;; given a number and a factor, return the factor of the number with respect to that base.
+  (define (order-of-factor number factor)
+    (define (iter number factor order)
+      (if (= (modulo number factor) 0)
+          (iter (inexact->exact (/ number factor)) ;; divide the number by the given factor, since we know it divides it evenly there should be no remainder and inexact->exact only does type conversion
+                factor
+                (1+ order))
+          order)) ;; if the factor does not divide the current number, return the order.
+    (iter number factor 0))
+
+  (list (order-of-factor index 2)
+        (order-of-factor index 3)
+        (order-of-factor index 5)))
+          
+      
+;; this is without optimizations for the solution with respect to 33, for example we know that there are no solutions that are all even, so the regular increment-3-pivot simply skips all those solutions.
+(define (unopt-increment-3-pivot-list pivot 2nd 3rd)
   (cond ((= pivot 2nd 3rd)
          (list (1+ pivot) 0 0))
         ((= pivot 3rd)
          (list pivot (1+ 2nd) (1+ 2nd)))
         (else
          (list pivot 2nd (1+ 3rd)))))
-;;(define (increment-3-pivot-list pivot 2nd 3rd)
-  ;;(cond ((= pivot 2nd 3rd)
-         ;;(list (+1 pivot) 0 0))
-        ;;((= pivot 3rd)
-         ;;(list pivot (+1 3rd) (+1 3rd)))
-        ;;(else
-         ;;(list pivot 2nd (+1 3rd)))))
+
+;; The following optimizations are made
+;; all solutions have exactly 1 or 3 odd integers
+;; there is no 2 dimensional solution (proof incoming), so there are no 0's in any solution
+(define (increment-3-pivot-list pivot 2nd 3rd)
+  (cond ((even? pivot)
+         (error "pivot should not be even!" pivot 2nd 3rd))
+        ((= pivot 2nd 3rd)
+         (list (+ pivot 2) 2 2))
+        ((< pivot (+ 2 3rd))
+         (if (< pivot (+ 2 2nd))
+             (list pivot 1 1) ;; evens are done, now do odds.
+             (list pivot (+ 2 2nd) (+ 2 2nd)))) ;; there are still combinations in our given parity that we're not considering, iterate again 
+        (else
+         (list pivot 2nd (+ 2 3rd)))))
+
+                   
+
+         
+
+
+
+
+;; given three numbers, sum their cubes
+(define (dioph-calc a b c)
+  (+ (expt a 3)
+     (expt b 3)
+     (expt c 3)))
+
+;; append contents to filename. This will be used to pick up where we left off in the case of termination.
+;;(define (save-out filename content
