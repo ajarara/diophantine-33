@@ -35,11 +35,12 @@
 		     (* 8 index)))
 	    3))))))
 
-;; small function to see if I can use the unceiling'd quantity to determine position
-;; within index
-(define tst
-  (lambda (index)
-    (* (/ 1 4)
-       (- (sqrt (+ 1
-                   (* 8 index)))
-          3))))
+
+(define increment-2-pivot-list
+  (lambda (2-pivot-list)
+    (let ((a (car 2-pivot-list))
+          (b (cadr 2-pivot-list)))
+      (cond ((= a b)
+             (list (1+ a) 0))
+            (else
+             (list a (1+ b)))))))

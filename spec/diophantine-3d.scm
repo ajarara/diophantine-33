@@ -7,10 +7,10 @@
        (tests
         (test "index returns values consistent with description (abbrev rvcwd)"
               e
-              (let ((input-output-pairing `(((2 1 1) 60)
-                                           ((3 1 1) 120)
-                                           ((1 1 1) 30)
-                                           ((1 0 1) 10))))
+              (let ((input-output-pairing `((((2 1 1)) 60)
+                                           (((3 1 1)) 120)
+                                           (((1 1 1)) 30)
+                                           (((1 0 1)) 10))))
                 (assert-false (memq #f (mapf index input-output-pairing)))))
         (test "pivot-list-of-index is the inverse of the proc index"
               e
@@ -21,14 +21,6 @@
                                             ((10) (1 0 1))
                                             ((337500) (2 3 5)))))
                 (assert-false (memq #f (mapf pivot-list-of-index input-output-pairing)))))
-        (test "unopt-inc-3-pivot-list rvcwd"
-              e
-              (let ((input-output-pairing `(((2 1 1) (2 1 2))
-                                            ((1 0 0) (1 0 1))
-                                            ((0 0 0) (1 0 0))
-                                            ((2 2 2) (3 0 0))
-                                            ((3 0 3) (3 1 1)))))
-                (assert-false (memq #f (mapf unopt-increment-3-pivot-list input-output-pairing)))))
         (test "diophantine-calculate rvcwd"
               e
               (let ((input-output-pairing `(((2 1 1) 10)
@@ -36,16 +28,82 @@
                                             ((1 1 1) 3)
                                             ((4 3 1) 92))))
                 (assert-false (memq #f (mapf dioph-calc input-output-pairing)))))
+        ))
+
+(suite "gen-increment-3-pivot-list works as expected"
+       (tests
+        (test "fringe cases increment the pivot"
+              e
+              (assert-equal (list 5 0 0)
+                            (gen-increment-3-pivot-list `(4 4 4))))
+        (test "gen-increment-3-pivot-list increments correctly under non-fringe-cases"
+              e
+              (assert-equal (list 7 7 5)
+                            (gen-increment-3-pivot-list `(7 6 5))))
+        ))
+(suite "2+ adds two to a number and returns it"
+       (tests
+        (test "(2+ 0) => 2"
+              e
+              (assert-equal 2
+                            (2+ 0)))
+        (test "(2+ 5) => 7"
+              e
+              (assert-equal 7
+                            (2+ 5)))
+        (test "(2+ -7) => -5"
+              e
+              (assert-equal -5
+                            (2+ -7)))
+        ))
+
+(suite "increment-3-pivot-list optimized works as expected"
+       (tests
         (test "inc-3-pivot-list exits with error on even pivot"
               e
-              (assert-true (error? (increment-3-pivot-list 2 0 0))))
-        (test "inc-3-pivot-list rvcwd"
+              (assert-true (error? (increment-3-pivot-list `(2 0 0)))))
+        (test "inc-3-pivot-list jumps to next pivot on equality"
               e
-              (let ((input-output-pairing `(((1 1 1) (3 2 2)) ;; testing jump to next pivot
-                                            ((3 1 1) (3 3 1)) ;; testing incrementation within the range of a given pivot
-                                            ((5 5 5) (7 2 2)) ;; testing jump to next pivot
-                                            ((5 1 1) (5 1 3)) ;; more regular incs
-                                            ((5 1 3) (5 1 5))
-                                            ((5 1 5) (5 3 3)))))
-                (assert-false (memq #f (mapf increment-3-pivot-list input-output-pairing)))))
-        ))
+              (assert-equal (list 7 2 2)
+                            (increment-3-pivot-list `(5 5 5))))
+        (test "inc-3-pivot-list increments correctly under non-fringe cases"
+              e
+              (assert-equal (list 9 3 1)
+                            (increment-3-pivot-list `(9 1 1))))
+        (test "inc-3-pivot-list moves to the odd section of iteration"
+              e
+              (assert-equal (list 5 1 1)
+                            (increment-3-pivot-list `(5 4 4))))
+        (test "inc-3-pivot-list handles intra-pivot inc correctly"
+              e
+              (assert-equal (list 3 3 3)
+                            (increment-3-pivot-list `(3 3 1))))
+        (test "inc-3-pivot-list handles intra-pivot inc correctly"
+              e
+              (assert-equal (list 5 3 3)
+                            (increment-3-pivot-list `(5 3 1))))
+))
+
+
+(suite "incrementer takes signals and behaves expectedly"
+       (tests
+        (test "incrementer is instantiated with an index, given the signal `current returns the list it is at"
+              e
+              (let ((our-index (index `(5 1 2))))
+                (assert-equal (list 5 1 2)
+                              ((make-incrementer increment-3-pivot-list our-index) `current))))
+        (test "incrementer given signal `next invokes inc-3-pivot-list and returns the list given"
+              e
+              (let ((our-index (index `(5 3 1))))
+                (assert-equal (list 5 3 3)
+                              ((make-incrementer increment-3-pivot-list our-index) `next))))
+        (test "incrementer pops out its index"
+              e
+              (assert-equal 1620000
+                            ((make-incrementer increment-3-pivot-list 1620000) `index)))
+        (test "incrementer returns the function it is generated with"
+              e
+              (assert-equal increment-3-pivot-list
+                            ((make-incrementer increment-3-pivot-list 1200) `inc-get)))
+
+))
