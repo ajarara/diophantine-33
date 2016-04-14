@@ -105,5 +105,11 @@
               e
               (assert-equal increment-3-pivot-list
                             ((make-incrementer increment-3-pivot-list 1200) `inc-get)))
-
 ))
+
+(suite "populate takes a 3-list and returns a list of all types of valid tries"
+       (tests
+	 (test "a distinct list gives us nothing"
+	       e
+	       (assert-true #t))
+	 ))

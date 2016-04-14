@@ -1,3 +1,5 @@
+﻿;; need this for our control mechanism
+(use-modules (rnrs io ports))
 
 ;; it's pretty hard to enumerate through 3 dimensions by walking through a 3d lattice, especially when you introduce duplicates. so the inspiration from the pairing function's geometric representation is not really applicable here..
 ;; instead, we can just enumerate through tuples, being careful to avoid repeats.
@@ -23,7 +25,7 @@
 ;;
 ;; (1 0 1)
 ;;
-;; now the 2nd case is satisfied, we inc the element to the right of the last
+;; now the second case is satisfied, we inc the element to the right of the last
 ;; element, and reset the last element.
 ;;
 ;; (1 1 0)
@@ -47,11 +49,11 @@
 
 (define (index pivot-list)
   (let ((pivot (car pivot-list))
-        (2nd (cadr pivot-list))
-        (3rd (caddr pivot-list)))
+        (second (cadr pivot-list))
+        (third (caddr pivot-list)))
     (* (expt 2 pivot)
-       (expt 3 2nd)
-       (expt 5 3rd))))
+       (expt 3 second)
+       (expt 5 third))))
 
 ;; given a number, return the associated pivot list in that order.
 (define (pivot-list-of-index index)
@@ -69,60 +71,59 @@
         (order-of-factor index 3)
         (order-of-factor index 5)))
           
-      
 ;; this is without optimizations for the solution with respect to 33, for example we know that there are no solutions that are all even, so the regular increment-3-pivot simply skips all those solutions.
 (define (gen-increment-3-pivot-list pivot-list)
   (let ((pivot (car pivot-list))
-        (2nd (cadr pivot-list))
-        (3rd (caddr pivot-list)))
-    (cond ((= pivot 2nd 3rd)
+        (second (cadr pivot-list))
+        (third (caddr pivot-list)))
+    (cond ((= pivot second third)
            (list (1+ pivot) 0 0))
-          ((= pivot 2nd)
-           (list pivot (1+ 2nd) (1+ 2nd)))
+          ((= pivot second)
+           (list pivot (1+ second) (1+ second)))
           (else
-           (list pivot (1+ 2nd) 3rd)))))
+           (list pivot (1+ second) third)))))
 
 ;; The following optimizations are made
 ;; all solutions have exactly 1 or 3 odd integers
 ;; there is no 2 dimensional solution (proof incoming), so there are no 0's in any solution
 (define (increment-3-pivot-list pivot-list)
   (let ((pivot (car pivot-list))
-        (2nd (cadr pivot-list))
-        (3rd (caddr pivot-list)))
+        (second (cadr pivot-list))
+        (third (caddr pivot-list)))
     (cond ((even? pivot)
-           (error "pivot should not be even!" pivot 2nd 3rd))
-          ((= pivot 2nd 3rd)
+           (error "pivot should not be even!" pivot second third))
+          ((= pivot second third)
            (list (+ pivot 2) 2 2))
-          ((< pivot (+ 2 3rd))
+          ((< pivot (+ 2 third))
            (list pivot 1 1)) ;; evens are done, now do odds.
-          ((< pivot (+ 2 2nd))
-           (list pivot 2nd (+ 2 3rd))) ;; there are still combinations in our given parity that we're not considering, iterate again 
-          ((= 2nd (+ 2 3rd))
-           (list pivot 2nd (+ 2 3rd)))
+          ((< pivot (+ 2 second))
+           (list pivot second (+ 2 third))) ;; there are still combinations in our given parity that we're not considering, iterate again 
+          ((= second (+ 2 third))
+           (list pivot second (+ 2 third)))
           (else
-           (list pivot (+ 2 2nd) 3rd)))))
+           (list pivot (+ 2 second) third)))))
 
 (define 2+
   (lambda (number)
     (+ 2 number)))
 
-;; start by checking all the possible solutions with 1 odd, 2 even, until incrementing the 3rd value is more than the pivot
+;; start by checking all the possible solutions with 1 odd, 2 even, until incrementing the third value is more than the pivot
 ;; then check all the possible solutions with all odd.
 (define (increment-3-pivot-list pivot-list)
   (let ((pivot (car pivot-list))
-        (2nd (cadr pivot-list))
-        (3rd (caddr pivot-list)))
+        (second (cadr pivot-list))
+        (third (caddr pivot-list)))
     (cond ((even? pivot)
-           (error "pivot should never be even!" pivot 2nd 3rd))
-          ((= pivot 2nd 3rd) ; odds are done, increment the pivot and start again with 2s
+           (error "pivot should never be even!" pivot second third))
+          ((= pivot second third) ; odds are done, increment the pivot and start again with 2s
            (list (2+ pivot) 2 2))
-          ((< pivot (2+ 3rd)) ; evens are done, switch to odd solutions
-           ; this is provided that our 2nd is never greater than our 3rd, which we'll take care of in the next cond
+          ((< pivot (2+ third)) ; evens are done, switch to odd solutions
+           ; this is provided that our second is never greater than our third, which we'll take care of in the next cond
            (list pivot 1 1))
-          ((< 2nd (2+ 3rd)) ; incrementing our 3rd number breaks our enumeration scheme
-           (list pivot (2+ 2nd) (remainder 3rd 2))) ; bump our 2nd number, reset the 2nd to its parity
-          (else ; we're safe to increment our 3rd number
-           (list pivot 2nd (2+ 3rd)))
+          ((< second (2+ third)) ; incrementing our third number breaks our enumeration scheme
+           (list pivot (2+ second) (remainder third 2))) ; bump our second number, reset the second to its parity
+          (else ; we're safe to increment our third number
+           (list pivot second (2+ third)))
           )))
            
 
@@ -145,10 +146,11 @@
 (define (make-incrementer inc-function some-index)
   (define pivot-list (pivot-list-of-index some-index))
   (define (dispatch signal)
-    (cond ((eq? signal `current)
-           pivot-list)
+  	(cond 
           ((eq? signal `next)
            (set! pivot-list (inc-function pivot-list))
+           pivot-list)
+	  ((eq? signal `current)
            pivot-list)
           ((eq? signal `index)
            (index pivot-list))
@@ -156,3 +158,93 @@
            inc-function)
           ))
   dispatch)
+
+
+(define (stub something)
+  (display "something")
+  #t)
+
+;; given a 3-multiset (as defined by GSL), we want to generate all combinations of negative and positive entries. we need to identify the type of the multiset, and then call the appropriate generating function
+;; there are only 3 cases we should be handling:
+;;   1. all integers are distinct
+;;   2. the pivot and the 2nd integer are the same
+;;   3. the 2nd and 3rd integer are the same.
+;; the most intensive (and unfortunately most common case) is when all the integers are distinct, and we have to generate all possibilities (besides all negative and all positive). luckily we're working in 3 dimensions here
+(define list-of-z-integers
+  (lambda (3-multiset)
+    (let ((multiset-type (type-of-multiset 3-multiset)))
+      (cond ((eq? multiset-type `all-distinct)
+             (stub "all-distinct"))
+            ((eq? multiset-type `single-dup)
+             (stub "single-dup"))
+            ((eq? multiset-type `homogenous) ; we have a try of the form (b b b) b an integer, but this is never a solution, no matter the signs of b. return the empty list.
+             `())))))
+
+
+
+;; this is the list we're mapping to when all our elements are distinct:
+;; there are no solutions of all negative and positive values
+(define distinct-map
+  `(
+    (1 -1 -1)
+    (-1 1 -1)
+    (-1 -1 1)
+    (1 1 -1)
+    (1 -1 1)
+    (-1 1 1)))
+
+;; this is the list we're mapping to when our pivot and 2nd integer are the same:
+;; they can't have opposite signs, as that would imply that we would have a 1 dimensional solution, which we clearly don't
+;; that combined with the fact that we have no solutions that are all negative or all positive means we only need to check two solutions.
+(define 1,2-dup-map
+  `(
+    (1 1 -1)
+    (-1 -1 1)))
+
+;; analagous to the above
+(define 2,3-dup-map
+  `(
+    (-1 1 1)
+    (1 -1 -1)))
+    
+
+;; BEGIN user interface portion of the script
+
+(define helpstring
+  "Incorrect command. Currently supported commands are:
+  \tq : display where we're at, quit the program
+  \tc : display where we're at
+  \tanything else: display this message. It's free!")
+
+(define prelim
+  (lambda (the-incrementer the-value-in-question)
+    (define input (standard-input-port))
+    ;; iterate until there's something buffered in our input port or we've solved the diophantine equation in question, whichever comes first.
+    (while (or (not (char-ready? input)) (= the-value-in-question (apply dioph-calc (the-incrementer `current))))
+	   (the-incrementer `next))
+    (cond ((not (char-ready? input))
+	   (display "Holy shit, we found it! The answer is: ")
+	   (display (the-incrementer `current))
+	   ;;; just so we have something for our unit tests
+	   #t)
+	  (else
+	    ;;; okay, we haven't solved it... what did the user input?
+	    ;;; only lines with one character are entertained.
+	    (let ((command (read input)))
+	      (cond ((eq? command `q)
+		     (display (the-incrementer `current))
+		     (newline))
+		    ((eq? command `c)
+		     (display (the-incrementer `current))
+		     (newline)
+		     (prelim the-incrementer the-value-in-question))
+		    (else 
+		      (display helpstring)
+		      (newline)
+		      (prelim the-incrementer the-value-in-question))
+	      ))))))
+	  
+
+
+
+;; END user interface portion of the script
