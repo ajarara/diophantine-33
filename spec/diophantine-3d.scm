@@ -107,6 +107,31 @@
                             ((make-incrementer increment-3-pivot-list 1200) `inc-get)))
 ))
 
+(suite "generate-from-seed takes a 3-list and a list of 3-lists and returns a list of results from the multiplication."
+       (tests
+	 (test "giving a null list as the list of lists returns the null list"
+	       e
+	       (assert-true (null? (generate-from-seed `(5 4 3) `()))))
+	 (test "trivial case of only one list 0's in the LoL"
+	       e
+	       (assert-equal `((0 0 0))
+			     (generate-from-seed `(5 4 3) `((0 0 0)))))
+	 (test "using `(8 9 10) on the distinct map gets us what we're looking for"
+	       e
+	       (assert-equal `((8 -9 -10)
+			       (-8 9 -10)
+			       (-8 -9 10)
+			       (8 9 -10)
+			       (8 -9 10)
+			       (-8 9 10))
+			     (generate-from-seed `(8 9 10) distinct-map)))
+	 (test "using `(8 9 10) on the 1,2-dup-map gets us what we're looking for (note that this wouldn't happen in 'production' but this is good for testing, I think."
+	       e
+	       (assert-equal `((8 9 -10)
+			       (-8 -9 10))
+			     (generate-from-seed `(8 9 10) 1,2-dup-map)))
+
+	 ))
 (suite "populate takes a 3-list and returns a list of all types of valid tries"
        (tests
 	 (test "a distinct list gives us nothing"

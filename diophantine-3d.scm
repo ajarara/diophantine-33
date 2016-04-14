@@ -1,6 +1,8 @@
-﻿;; need this for our control mechanism
+﻿;; need this for our control mechanism, will possibly move this out to some other file someday
 (use-modules (rnrs io ports))
 
+;; needed entirely for the fold proc
+(use-modules (srfi srfi-1))
 ;; it's pretty hard to enumerate through 3 dimensions by walking through a 3d lattice, especially when you introduce duplicates. so the inspiration from the pairing function's geometric representation is not really applicable here..
 ;; instead, we can just enumerate through tuples, being careful to avoid repeats.
 ;; the way we do this is by constructing a list, like below
@@ -9,7 +11,7 @@
 ;;
 ;; the first element is our pivot, in this case 0.
 ;; compare the other elements in the list with the pivot.
-;; in the 3 dimensional situation, we only have 3 cases that concern us:
+;; in the 3 dimensional situation (it gets more complicated with n), we only have 3 cases that concern us:
 ;;
 ;; the case where the other 2 elements are equal to the pivot
 ;; the case where the last element is equal to the pivot
@@ -159,28 +161,45 @@
           ))
   dispatch)
 
-
-(define (stub something)
-  (display "something")
-  #t)
-
 ;; given a 3-multiset (as defined by GSL), we want to generate all combinations of negative and positive entries. we need to identify the type of the multiset, and then call the appropriate generating function
 ;; there are only 3 cases we should be handling:
 ;;   1. all integers are distinct
 ;;   2. the pivot and the 2nd integer are the same
 ;;   3. the 2nd and 3rd integer are the same.
-;; the most intensive (and unfortunately most common case) is when all the integers are distinct, and we have to generate all possibilities (besides all negative and all positive). luckily we're working in 3 dimensions here
-(define list-of-z-integers
-  (lambda (3-multiset)
-    (let ((multiset-type (type-of-multiset 3-multiset)))
-      (cond ((eq? multiset-type `all-distinct)
-             (stub "all-distinct"))
-            ((eq? multiset-type `single-dup)
-             (stub "single-dup"))
-            ((eq? multiset-type `homogenous) ; we have a try of the form (b b b) b an integer, but this is never a solution, no matter the signs of b. return the empty list.
-             `())))))
+;; the most intensive (and unfortunately most common case) is when all the integers are distinct, and we have to generate all possibilities (besides all negative and all positive).
+;; one thing we are not worried about is when all three entries are the same, they can't all be positive, they can't all be negative, so one has to cancel out the other. but that would imply a 1 dimensional solution, which we know is not possible.
+;; we're also not worried about the pivot and the 3rd integer being equal. in order for that to happen, then we must have a list that also satisfies the sentence right above this one, and we've already proven that it's a non-issue.
+
+(define populate-list
+  (lambda (seed-list)
+    (let ((pivot (car seed-list))
+	  (2nd (cadr seed-list))
+	  (3rd (caddr seed-list)))
+      (cond ((= pivot 2nd)
+	     (if (= pivot 3rd)
+	       `() ; then we have a triplet, so we'll ignore it and return the empty list
+	       (generate-from-seed seed-list 1,2-dup-map))) ; then we only have the 1st two integers as duplicates, with the third one distinct. return the list we want
+	    ((= 2nd 3rd)
+	     (generate-from-seed seed-list 2,3-dup-map))
+	    (else
+	      (generate-from-seed seed-list distinct-map))
+	    ))))
 
 
+
+
+
+;; given a seed-list and a list of lists, multiply the elements in the seed-list with the elements in each list of lists... I think this is one of those functions that are more clear when written out then when documented.
+
+(define (generate-from-seed seed-list list-of-lists)
+  (map (lambda (list-from-lol)
+	 ;;; we use fold-right here to preserve list order
+	 (fold-right (lambda (seed-elem lol-elem prev)
+		 (cons (* seed-elem lol-elem) prev))
+	       `()
+	       seed-list
+	       list-from-lol))
+       list-of-lists))
 
 ;; this is the list we're mapping to when all our elements are distinct:
 ;; there are no solutions of all negative and positive values
@@ -201,12 +220,34 @@
     (1 1 -1)
     (-1 -1 1)))
 
-;; analagous to the above
+;; analagous to the above, applies if our 2nd and 3rd integers are equal.
 (define 2,3-dup-map
   `(
     (-1 1 1)
     (1 -1 -1)))
     
+
+;; now we have all the machinery for the full fledged enumerator
+
+(define (space-enumerator incrementer)
+  (define working-list `())
+  (define (dispatch signal)
+    ; if the working list is null, populate it with new values and recall dispatch with the signal it was given
+    (cond ((null? working-list)
+	   (set! working-list (populate-list (incrementer `next)))
+	   (dispatch signal))
+	  ((eq? signal `current)
+	   (car working-list))
+	  ((eq? signal `next)
+	   (set! working-list (cdr working-list))
+	   (dispatch `current))
+	  ((eq? signal `index)
+	   (incrementer `index))
+	  ((eq? signal `inc-get)
+	   (incrementer `inc-get))
+	  ))
+  dispatch)
+
 
 ;; BEGIN user interface portion of the script
 
@@ -216,32 +257,73 @@
   \tc : display where we're at
   \tanything else: display this message. It's free!")
 
+;; big meaty function, is our preliminary controller for our enumeration. i have no idea how to break this down into further parts.
 (define prelim
-  (lambda (the-incrementer the-value-in-question)
+  (lambda (the-incrementer the-value-in-question verbosity)
     (define input (standard-input-port))
-    ;; iterate until there's something buffered in our input port or we've solved the diophantine equation in question, whichever comes first.
-    (while (or (not (char-ready? input)) (= the-value-in-question (apply dioph-calc (the-incrementer `current))))
-	   (the-incrementer `next))
+    (define continuation-condition ; should we iterate? well, if...
+      (lambda ()
+        (not (or (char-ready? input) ; no commands are available
+	         (= the-value-in-question
+	            (apply dioph-calc (the-incrementer `current))))))) ; or the equation isn't solved
+    ;;; then keep iterating baby!
+    (if (not verbosity)
+      ;;; simple enough, check the cont condition defined above, then try again with the next value
+      (while (continuation-condition)
+	     (the-incrementer `next))
+      ;;; okay, verbosity is enabled. this program was not designed to be ran with verbosity enabled all the time, which is both really inefficient and annoying (especially with tmux)
+      ;;; it can't use the continuation condition as that causes it to apply dioph-calc twice.
+      ;;; this can probably be rewritten, but it's 1:00 AM, so I'm going to sleep.
+      (while (not (char-ready? input))
+	     (let ((our-try (the-incrementer `current))
+		   (our-result (apply dioph-calc (the-incrementer `current))))
+	       (display "Trying ")
+	       (display our-try)
+	       (display " yielded: ")
+	       (display our-result)
+	       (newline)
+
+	       ;;; this is a straight up hack because verbosity mode would be really inefficient otherwise...
+	       ;;; we place a character so that there is a char-ready in our input port, and that character happens to invoke the quit command in the thunk below
+	       (if (= our-result the-value-in-question)
+		 (display "Holy shit, we found it! The answer is: ")
+		 (unread-string "q" input)))))
+
+	     
+
+    ;;; oh boy something happened!
     (cond ((not (char-ready? input))
 	   (display "Holy shit, we found it! The answer is: ")
 	   (display (the-incrementer `current))
 	   ;;; just so we have something for our unit tests
 	   #t)
 	  (else
-	    ;;; okay, we haven't solved it... what did the user input?
+	    ;;; okay, we haven't solved it... what did the user interru -- I mean.. input?
 	    ;;; only lines with one character are entertained.
 	    (let ((command (read input)))
 	      (cond ((eq? command `q)
 		     (display (the-incrementer `current))
 		     (newline))
 		    ((eq? command `c)
-		     (display (the-incrementer `current))
+		     (let ((status (the-incrementer `current)))
+		       (display status)
+		       (display " yields: ")
+		       (display (apply dioph-calc status)))
 		     (newline)
-		     (prelim the-incrementer the-value-in-question))
+		      (prelim the-incrementer the-value-in-question verbosity))
+		    ((eq? command `v)
+		     ; ugh, why'd you enable verbosity?
+		     (if verbosity
+		       (display "Verbosity disabled")
+		       (display "Verbosity enabled"))
+		     (newline)
+		     (prelim the-incrementer the-value-in-question (not verbosity)))
+
+		     
 		    (else 
 		      (display helpstring)
 		      (newline)
-		      (prelim the-incrementer the-value-in-question))
+		      (prelim the-incrementer the-value-in-question verbosity))
 	      ))))))
 	  
 
