@@ -248,6 +248,7 @@
 	  ))
   dispatch)
 
+;; I know this is significantly better implemented as a stream of values to be tested instead of something that holds the lists and dispenses them one at a time, generating new lists when needed (sometimes every other element in some bad cases) but this seemed to be the most natural way to write it as of the knowledge I have
 
 ;; BEGIN user interface portion of the script
 
@@ -256,6 +257,7 @@
   \tq : display where we're at, quit the program
   \tc : display where we're at
   \tanything else: display this message. It's free!")
+
 
 ;; big meaty function, is our preliminary controller for our enumeration. i have no idea how to break this down into further parts.
 (define prelim
@@ -273,27 +275,15 @@
 	     (the-incrementer `next))
       ;;; okay, verbosity is enabled. this program was not designed to be ran with verbosity enabled all the time, which is both really inefficient and annoying (especially with tmux)
       ;;; it can't use the continuation condition as that causes it to apply dioph-calc twice.
-      ;;; this can probably be rewritten, but it's 1:00 AM, so I'm going to sleep.
-      (while (not (char-ready? input))
-	     (let ((our-try (the-incrementer `current))
-		   (our-result (apply dioph-calc (the-incrementer `current))))
-	       (display "Trying ")
-	       (display our-try)
-	       (display " yielded: ")
-	       (display our-result)
-	       (newline)
-
-	       ;;; this is a straight up hack because verbosity mode would be really inefficient otherwise...
-	       ;;; we place a character so that there is a char-ready in our input port, and that character happens to invoke the quit command in the thunk below
-	       (if (= our-result the-value-in-question)
-		 (display "Holy shit, we found it! The answer is: ")
-		 (unread-string "q" input)))))
-
+      (while (continuation-condition)
+	     (let ((our-try (the-incrementer `current)))
+	       (display (format #f "Trying ~a yielded: ~a\n" our-try (apply dioph-calc our-try)))
+	       (the-incrementer `next))))
 	     
 
     ;;; oh boy something happened!
     (cond ((not (char-ready? input))
-	   (display "Holy shit, we found it! The answer is: ")
+	   (display "Holy shit we found it! The answer is: ")
 	   (display (the-incrementer `current))
 	   ;;; just so we have something for our unit tests
 	   #t)
