@@ -82,6 +82,14 @@
               e
               (assert-equal (list 5 3 3)
                             (increment-3-pivot-list `(5 3 1))))
+	(test "inc-3-pivot-list handles moving from odd to even"
+	      e
+	      (assert-equal (list 103 2 2)
+			    (increment-3-pivot-list `(101 101 101))))
+	(test "inc-3-pivot-list bumps the 2nd integer on equality"
+	      e
+	      (assert-equal (list 891 6 2)
+			    (increment-3-pivot-list `(891 4 4))))
 ))
 
 
@@ -132,9 +140,20 @@
 			     (generate-from-seed `(8 9 10) 1,2-dup-map)))
 
 	 ))
-(suite "populate takes a 3-list and returns a list of all types of valid tries"
+(suite "populate-list takes a 3-list and returns a list of all types of valid tries"
        (tests
-	 (test "a distinct list gives us nothing"
+	 (test "a fully uniform list gives us the null list"
 	       e
-	       (assert-true #t))
+	       (assert-true (null? (populate-list `(5 5 5)))))
+	 (test "a 1,2 dup list gives us a list of length 2 with negations of each"
+	       e
+	       (assert-equal `((8 8 -5)
+			       (-8 -8 5))
+			     (populate-list `(8 8 5))))
+	 (test "a 2,3 dup behaves the same way as above, only the pivot is the toggle"
+	       e
+	       (assert-equal `((-207 1494 1494)
+			       (207 -1494 -1494))
+			     (populate-list `(207 1494 1494))))
+
 	 ))

@@ -85,26 +85,6 @@
           (else
            (list pivot (1+ second) third)))))
 
-;; The following optimizations are made
-;; all solutions have exactly 1 or 3 odd integers
-;; there is no 2 dimensional solution (proof incoming), so there are no 0's in any solution
-(define (increment-3-pivot-list pivot-list)
-  (let ((pivot (car pivot-list))
-        (second (cadr pivot-list))
-        (third (caddr pivot-list)))
-    (cond ((even? pivot)
-           (error "pivot should not be even!" pivot second third))
-          ((= pivot second third)
-           (list (+ pivot 2) 2 2))
-          ((< pivot (+ 2 third))
-           (list pivot 1 1)) ;; evens are done, now do odds.
-          ((< pivot (+ 2 second))
-           (list pivot second (+ 2 third))) ;; there are still combinations in our given parity that we're not considering, iterate again 
-          ((= second (+ 2 third))
-           (list pivot second (+ 2 third)))
-          (else
-           (list pivot (+ 2 second) third)))))
-
 (define 2+
   (lambda (number)
     (+ 2 number)))
@@ -123,7 +103,7 @@
            ; this is provided that our second is never greater than our third, which we'll take care of in the next cond
            (list pivot 1 1))
           ((< second (2+ third)) ; incrementing our third number breaks our enumeration scheme
-           (list pivot (2+ second) (remainder third 2))) ; bump our second number, reset the second to its parity
+           (list pivot (2+ second) (- 2 (remainder third 2)))) ; bump our second number, reset the second to its parity
           (else ; we're safe to increment our third number
            (list pivot second (2+ third)))
           )))
@@ -187,18 +167,14 @@
 
 
 
+;; oh... map does this better.
 
-
-;; given a seed-list and a list of lists, multiply the elements in the seed-list with the elements in each list of lists... I think this is one of those functions that are more clear when written out then when documented.
+(define (multiply-two-lists list1 list2)
+  (map * list1 list2))
 
 (define (generate-from-seed seed-list list-of-lists)
-  (map (lambda (list-from-lol)
-	 ;;; we use fold-right here to preserve list order
-	 (fold-right (lambda (seed-elem lol-elem prev)
-		 (cons (* seed-elem lol-elem) prev))
-	       `()
-	       seed-list
-	       list-from-lol))
+  (map (lambda (list-from-listol)
+	 (multiply-two-lists seed-list list-from-listol))
        list-of-lists))
 
 ;; this is the list we're mapping to when all our elements are distinct:
@@ -226,7 +202,6 @@
     (-1 1 1)
     (1 -1 -1)))
     
-
 ;; now we have all the machinery for the full fledged enumerator
 
 (define (space-enumerator incrementer)
@@ -301,6 +276,9 @@
 		       (display (apply dioph-calc status)))
 		     (newline)
 		      (prelim the-incrementer the-value-in-question verbosity))
+		    ((eq? command `i)
+		     (display (format #f "Quitting program.\n To restart at the point where we saved, use this index:\n~a" (the-incrementer `index)))
+		     (newline))
 		    ((eq? command `v)
 		     ; ugh, why'd you enable verbosity?
 		     (if verbosity
