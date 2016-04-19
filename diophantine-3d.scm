@@ -85,9 +85,13 @@
           (else
            (list pivot (1+ second) third)))))
 
-(define 2+
-  (lambda (number)
-    (+ 2 number)))
+(define (2+ number)
+  (+ 2 number))
+
+;; given an odd number, returns 1, given an even, returns 2.
+;; this proc is only used once, but warrants a description, the reason I use this instead of remainder is because I want to elimate all solutions with 0 in them (there is no 2-dimensional solution for 33), and this provides a very convenient way to reset our third number in the following procedure
+(define (upper-mod number)
+  (- 2 (remainder number 2)))
 
 ;; start by checking all the possible solutions with 1 odd, 2 even, until incrementing the third value is more than the pivot
 ;; then check all the possible solutions with all odd.
@@ -103,18 +107,23 @@
            ; this is provided that our second is never greater than our third, which we'll take care of in the next cond
            (list pivot 1 1))
           ((< second (2+ third)) ; incrementing our third number breaks our enumeration scheme
-           (list pivot (2+ second) (- 2 (remainder third 2)))) ; bump our second number, reset the second to its parity
+           (list pivot (2+ second) (upper-mod third))) ; bump our second number, reset the second to its parity
           (else ; we're safe to increment our third number
            (list pivot second (2+ third)))
           )))
            
 
-;; given three numbers, sum their cubes
+;; given three numbers, sum them
 (define (dioph-calc a b c)
   (+ (expt a 3)
      (expt b 3)
      (expt c 3)))
 
+
+;; given a list of three numbers and another number, apply the list to dioph-calc and compare it with the other number.
+(define (check-for-solution guess-list value-in-question)
+  (= (apply dioph-calc guess-list)
+     value-in-question))
 
 ;; instantiate an object with a given index. Given an index one would expect from the index function, construct the pivot list (allowing incrementers to be made at any point of the enumeration)
 ;; given the signal `current
@@ -167,8 +176,7 @@
 
 
 
-;; oh... map does this better.
-
+;; these two functions are used by populate-list to generate a list of attempts, based on the type of attempt family (1,2-dup, 2,3-dup, all distinct, etc.)
 (define (multiply-two-lists list1 list2)
   (map * list1 list2))
 

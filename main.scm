@@ -20,6 +20,7 @@
 (if (not (sanitize input-args))
   (error "input arguments are not correct as defined by the sanitize function in sanitize.scm" input-args))
 ;; okay we're all good
+(load "./interface.scm")
 (load "./diophantine-3d.scm")
 
 (define our-inc (make-incrementer increment-3-pivot-list (index input-args)))

@@ -140,6 +140,24 @@
 			     (generate-from-seed `(8 9 10) 1,2-dup-map)))
 
 	 ))
+
+(suite "check-for-solution applies the given list to dioph-calc and compares it with the given value"
+       (tests
+	 (test "the trivial case (check-for-solution `(0 0 0) 0) is true"
+	       e
+	       (assert-true (check-for-solution `(0 0 0) 0)))
+	 (test "negative numbers don't break our checking function"
+	       e
+	       (assert-true (check-for-solution `(3 -1 -1) 25)))
+	 (test "check-for-solution fails with incorrect inputs (31 has no integer solutions)"
+	       e
+	       (assert-false (check-for-solution `(3 1 1) 31)))
+	 (test "check-for-solution succeeds with (2 -1 -1) = 6"
+	       e
+	       (assert-true (check-for-solution `(2 -1 -1) 6)))
+	 ))
+
+
 (suite "populate-list takes a 3-list and returns a list of all types of valid tries"
        (tests
 	 (test "a fully uniform list gives us the null list"
