@@ -1,177 +1,89 @@
 ;; TEST FILE
-(load "../utility.scm")
 (load "../diophantine-3d.scm")
 (use-modules (ggspec lib))
 
-(suite "Auxiliary functions of dio-3d work as expected"
+(suite "2+ increments numbers by 2"
        (tests
-        (test "index returns values consistent with description (abbrev rvcwd)"
-              e
-              (let ((input-output-pairing `((((2 1 1)) 60)
-                                           (((3 1 1)) 120)
-                                           (((1 1 1)) 30)
-                                           (((1 0 1)) 10))))
-                (assert-false (memq #f (mapf index input-output-pairing)))))
-        (test "pivot-list-of-index is the inverse of the proc index"
-              e
-              ;; the inputs must be in list form, as mapf expects a list of arguments
-              (let ((input-output-pairing `(((60) (2 1 1))
-                                            ((120) (3 1 1))
-                                            ((45) (0 2 1))
-                                            ((10) (1 0 1))
-                                            ((337500) (2 3 5)))))
-                (assert-false (memq #f (mapf pivot-list-of-index input-output-pairing)))))
-        (test "diophantine-calculate rvcwd"
-              e
-              (let ((input-output-pairing `(((2 1 1) 10)
-                                            ((3 2 1) 36)
-                                            ((1 1 1) 3)
-                                            ((4 3 1) 92))))
-                (assert-false (memq #f (mapf dioph-calc input-output-pairing)))))
-        ))
-
-(suite "gen-increment-3-pivot-list works as expected"
-       (tests
-        (test "fringe cases increment the pivot"
-              e
-              (assert-equal (list 5 0 0)
-                            (gen-increment-3-pivot-list `(4 4 4))))
-        (test "gen-increment-3-pivot-list increments correctly under non-fringe-cases"
-              e
-              (assert-equal (list 7 7 5)
-                            (gen-increment-3-pivot-list `(7 6 5))))
-        ))
-(suite "2+ adds two to a number and returns it"
-       (tests
-        (test "(2+ 0) => 2"
-              e
-              (assert-equal 2
-                            (2+ 0)))
-        (test "(2+ 5) => 7"
-              e
-              (assert-equal 7
-                            (2+ 5)))
-        (test "(2+ -7) => -5"
-              e
-              (assert-equal -5
-                            (2+ -7)))
-        ))
-
-(suite "increment-3-pivot-list optimized works as expected"
-       (tests
-        (test "inc-3-pivot-list exits with error on even pivot"
-              e
-              (assert-true (error? (increment-3-pivot-list `(2 0 0)))))
-        (test "inc-3-pivot-list jumps to next pivot on equality"
-              e
-              (assert-equal (list 7 2 2)
-                            (increment-3-pivot-list `(5 5 5))))
-        (test "inc-3-pivot-list increments correctly under non-fringe cases"
-              e
-              (assert-equal (list 9 3 1)
-                            (increment-3-pivot-list `(9 1 1))))
-        (test "inc-3-pivot-list moves to the odd section of iteration"
-              e
-              (assert-equal (list 5 1 1)
-                            (increment-3-pivot-list `(5 4 4))))
-        (test "inc-3-pivot-list handles intra-pivot inc correctly"
-              e
-              (assert-equal (list 3 3 3)
-                            (increment-3-pivot-list `(3 3 1))))
-        (test "inc-3-pivot-list handles intra-pivot inc correctly"
-              e
-              (assert-equal (list 5 3 3)
-                            (increment-3-pivot-list `(5 3 1))))
-	(test "inc-3-pivot-list handles moving from odd to even"
-	      e
-	      (assert-equal (list 103 2 2)
-			    (increment-3-pivot-list `(101 101 101))))
-	(test "inc-3-pivot-list bumps the 2nd integer on equality"
-	      e
-	      (assert-equal (list 891 6 2)
-			    (increment-3-pivot-list `(891 4 4))))
-))
-
-
-(suite "incrementer takes signals and behaves expectedly"
-       (tests
-        (test "incrementer is instantiated with an index, given the signal `current returns the list it is at"
-              e
-              (let ((our-index (index `(5 1 2))))
-                (assert-equal (list 5 1 2)
-                              ((make-incrementer increment-3-pivot-list our-index) `current))))
-        (test "incrementer given signal `next invokes inc-3-pivot-list and returns the list given"
-              e
-              (let ((our-index (index `(5 3 1))))
-                (assert-equal (list 5 3 3)
-                              ((make-incrementer increment-3-pivot-list our-index) `next))))
-        (test "incrementer pops out its index"
-              e
-              (assert-equal 1620000
-                            ((make-incrementer increment-3-pivot-list 1620000) `index)))
-        (test "incrementer returns the function it is generated with"
-              e
-              (assert-equal increment-3-pivot-list
-                            ((make-incrementer increment-3-pivot-list 1200) `inc-get)))
-))
-
-(suite "generate-from-seed takes a 3-list and a list of 3-lists and returns a list of results from the multiplication."
-       (tests
-	 (test "giving a null list as the list of lists returns the null list"
+	 (test "2+ works on trivial entry"
 	       e
-	       (assert-true (null? (generate-from-seed `(5 4 3) `()))))
-	 (test "trivial case of only one list 0's in the LoL"
+	       (assert-equal 2
+			     (2+ 0)))
+	 (test "2+ works on negative numbers"
 	       e
-	       (assert-equal `((0 0 0))
-			     (generate-from-seed `(5 4 3) `((0 0 0)))))
-	 (test "using `(8 9 10) on the distinct map gets us what we're looking for"
+	       (assert-equal -1
+			     (2+ -3)))
+	 (test "2+ works on positive numbers"
 	       e
-	       (assert-equal `((8 -9 -10)
-			       (-8 9 -10)
-			       (-8 -9 10)
-			       (8 9 -10)
-			       (8 -9 10)
-			       (-8 9 10))
-			     (generate-from-seed `(8 9 10) distinct-map)))
-	 (test "using `(8 9 10) on the 1,2-dup-map gets us what we're looking for (note that this wouldn't happen in 'production' but this is good for testing, I think."
-	       e
-	       (assert-equal `((8 9 -10)
-			       (-8 -9 10))
-			     (generate-from-seed `(8 9 10) 1,2-dup-map)))
-
+	       (assert-equal 5
+			     (2+ 3)))
 	 ))
 
-(suite "check-for-solution applies the given list to dioph-calc and compares it with the given value"
+(suite "applying upper-mod to a number gives us a number of the same parity as the original number, s.t. 0 < the new number <= 2"
        (tests
-	 (test "the trivial case (check-for-solution `(0 0 0) 0) is true"
+	 (test "upper-mod odd num gives 1"
 	       e
-	       (assert-true (check-for-solution `(0 0 0) 0)))
-	 (test "negative numbers don't break our checking function"
+	       (assert-equal 1
+			     (upper-mod 5253451)))
+	 (test "upper-mod even num gives 2"
 	       e
-	       (assert-true (check-for-solution `(3 -1 -1) 25)))
-	 (test "check-for-solution fails with incorrect inputs (31 has no integer solutions)"
+	       (assert-equal 2
+			     (upper-mod 757456724534)))
+	 ))
+
+(suite "increment-3-pivot-list takes a list and increments it with the enumeration scheme provided in the description of the dio-3d file a directory below this one"
+       (tests
+	 (test "inc-3-pivot-list moves up to the next pivot on completion of the all odd solution attempts"
 	       e
-	       (assert-false (check-for-solution `(3 1 1) 31)))
-	 (test "check-for-solution succeeds with (2 -1 -1) = 6"
+	       (assert-equal `(7 2 2)
+			     (increment-3-pivot-list `(5 5 5))))
+	 (test "inc-3-pivot-list moves to the odd solutions after all evens have been exhausted"
 	       e
-	       (assert-true (check-for-solution `(2 -1 -1) 6)))
+	       (assert-equal `(13 1 1)
+			     (increment-3-pivot-list `(13 12 12))))
+	 (test "inc-3-pivot-list handles intra-pivot inc well, odd case, 3rd element"
+	       e
+	       (assert-equal `(15 7 5)
+			     (increment-3-pivot-list `(15 7 3))))
+	 (test "inc-3-pivot-list handles intra-pivot inc well, odd case, 2nd element"
+	       e
+	       (assert-equal `(23 15 1)
+			     (increment-3-pivot-list `(23 13 13))))
 	 ))
 
 
-(suite "populate-list takes a 3-list and returns a list of all types of valid tries"
+(suite "cube-list supersizes our lists"
        (tests
-	 (test "a fully uniform list gives us the null list"
+	 (test "works with trivial list"
 	       e
-	       (assert-true (null? (populate-list `(5 5 5)))))
-	 (test "a 1,2 dup list gives us a list of length 2 with negations of each"
+	       (assert-equal `(0 0 0)
+			     (cube-list `(0 0 0))))
+	 (test "works with semi-trivial list"
 	       e
-	       (assert-equal `((8 8 -5)
-			       (-8 -8 5))
-			     (populate-list `(8 8 5))))
-	 (test "a 2,3 dup behaves the same way as above, only the pivot is the toggle"
+	       (assert-equal `(1 1 1)
+			     (cube-list `(1 1 1))))
+	 (test "works with actual numbers"
 	       e
-	       (assert-equal `((-207 1494 1494)
-			       (207 -1494 -1494))
-			     (populate-list `(207 1494 1494))))
-
+	       (assert-equal `(27 125 216)
+			     (cube-list `(3 5 6))))
 	 ))
+
+(suite "identify-list suite"
+       (tests
+	 (test "given a distinct list we get a tag of distinct"
+	       e
+	       (assert-equal `distinct
+			     (identify-list `(8 6 3))))
+	 (test "given a 1,2-dup we get a tag of 1,2-dup"
+	       e
+	       (assert-equal `1,2-dup
+			     (identify-list `(101 101 3))))
+	 (test "given a 2,3-dup we get a tag of 2,3-dup"
+	       e
+	       (assert-equal `2,3-dup
+			     (identify-list `(250 105 105))))
+	 (test "given a triplet, we get a tag of triplet"
+	       e
+	       (assert-equal `triplet
+			     (identify-list `(6 6 6)))) ; the NUMBER of the BEAST
+	 ))
+
