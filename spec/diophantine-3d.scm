@@ -85,5 +85,32 @@
 	       e
 	       (assert-equal triplet-map
 			     (identify-list `(6 6 6)))) ; the NUMBER of the BEAST
+	 (test "the triplet-map is null"
+	       e
+	       (assert-true (null? triplet-map)))
 	 ))
 
+(suite "list-generate suite"
+       (tests
+	 (test "the trivial list returns null"
+	       e
+	       (assert-true (null? (list-generate `(0 0 0)))))
+	 (test "test of a 1,2-dup tuple gives us the generated list cubed mapped with the 1,2-dup-map"
+	       e
+	       (assert-equal `((125 125 -27)
+			       (-125 -125 27))
+			     (list-generate `(5 5 3))))
+	 (test "test of a 2,3-dup tuple, 2,3-dup-map"
+	       e
+	       (assert-equal `((-216 64 64)
+			       (216 -64 -64))
+			     (list-generate `(6 4 4))))
+	 (test "test of distinct gives us a crapton of values"
+	       e
+	       (assert-equal `((729 -216 -64)
+			       (-729 216 -64)
+			       (729 216 -64)
+			       (729 -216 64)
+			       (-729 216 64))
+			     (list-generate `(9 6 4))))
+	 ))

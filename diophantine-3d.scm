@@ -100,10 +100,6 @@
 	  (else
 	   distinct-map))))
 
-;; given a list, get the map identify-list returns, apply generate-from-seed onto the list
-(define (populate-list some-list)
-  (generate-from-seed some-list (identify-list some-list)))
-
 
 ;; these two functions are used by populate-list to generate a list of attempts, based on the type of attempt family (1,2-dup, 2,3-dup, all distinct, etc.)
 (define (multiply-two-lists list1 list2)
@@ -111,17 +107,16 @@
 
 ;; given a 3-list and a list of 3-lists, apply multiply-two-lists to each list in the list of 3-lists
 ;; could probably come up with better variable names
-(define (generate-from-seed seed-list list-of-lists)
+(define (generate-from-list some-list list-of-lists)
   (map (lambda (list-from-listol)
-	 (multiply-two-lists seed-list list-from-listol))
+	 (multiply-two-lists some-list list-from-listol))
        list-of-lists))
 
 ;; this is the list we're mapping to when all our elements are distinct:
 ;; there are no solutions of all negative and positive values, so we can eliminate those.
 ;; further, since we know that the pivot is >= the rest of the list, and that 2nd >= 3rd, we can throw out the (-1 -1 1) entry as well, as we're guaranteed that is negative, provided the list isn't all 0's
 (define distinct-map
-  `(
-    (1 -1 -1)
+  `((1 -1 -1)
     (-1 1 -1)
     (1 1 -1)
     (1 -1 1)
@@ -131,16 +126,20 @@
 ;; they can't have opposite signs, as that would imply that we would have a 1 dimensional solution, which we clearly don't
 ;; that combined with the fact that we have no solutions that are all negative or all positive means we only need to check two solutions.
 (define 1,2-dup-map
-  `(
-    (1 1 -1)
+  `((1 1 -1)
     (-1 -1 1)))
 
 ;; analagous to the above, applies if our 2nd and 3rd integers are equal.
 (define 2,3-dup-map
-  `(
-    (-1 1 1)
+  `((-1 1 1)
     (1 -1 -1)))
     
+;; triplets are never a solution
 (define triplet-map
   `())
 
+;; given a 3-list, get the associated list-map, cube the elements, and apply the list-map to the elements
+(define (list-generate some-list)
+  (let ((list-map (identify-list some-list))
+	(cubed-list (cube-list some-list)))
+    (generate-from-list cubed-list list-map)))
