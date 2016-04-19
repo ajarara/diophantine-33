@@ -69,21 +69,21 @@
 
 (suite "identify-list suite"
        (tests
-	 (test "given a distinct list we get a tag of distinct"
+	 (test "given a distinct list we get the distinct map"
 	       e
-	       (assert-equal `distinct
+	       (assert-equal distinct-map
 			     (identify-list `(8 6 3))))
-	 (test "given a 1,2-dup we get a tag of 1,2-dup"
+	 (test "given a 1,2-dup we get the 1,2-dup-map"
 	       e
-	       (assert-equal `1,2-dup
+	       (assert-equal 1,2-dup-map
 			     (identify-list `(101 101 3))))
-	 (test "given a 2,3-dup we get a tag of 2,3-dup"
+	 (test "given a 2,3-dup we get the 2,3-dup-map"
 	       e
-	       (assert-equal `2,3-dup
+	       (assert-equal 2,3-dup-map
 			     (identify-list `(250 105 105))))
-	 (test "given a triplet, we get a tag of triplet"
+	 (test "given a triplet, we get the triplet-map"
 	       e
-	       (assert-equal `triplet
+	       (assert-equal triplet-map
 			     (identify-list `(6 6 6)))) ; the NUMBER of the BEAST
 	 ))
 

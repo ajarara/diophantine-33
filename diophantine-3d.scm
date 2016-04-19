@@ -64,7 +64,7 @@
 ;; given a guess, check to see if the sum of the elements in the guess is equal to the value in question
 ;; not sure if I need this...
 (define (check-for-solution guess value-in-question)
-  (= (apply = guess)
+  (= (apply + guess)
      value-in-question))
 
 ;; this however, I do need
@@ -83,45 +83,34 @@
 ;;   3. the 2nd and 3rd integer are the same.
 ;; the most intensive (and unfortunately most common case) is when all the integers are distinct, and we have to generate all possibilities (besides all negative and all positive).
 ;; one thing we are not worried about is when all three entries are the same, they can't all be positive, they can't all be negative, so one has to cancel out the other. but that would imply a 1 dimensional solution, which we know is not possible.
-;; we're also not worried about the pivot and the 3rd integer being equal. in order for that to happen, then we must have a list that also satisfies the sentence right above this one, and we've already proven that it's a non-issue.
-;; first we identify the list
+;; we're also not worried about the pivot and the 3rd integer being equal. in order for that to happen, then we must have a list that is also a triplet, because of the way we arrived at that solution.
 
+
+;; !!! THIS PROCEDURE IDENTIFIES (5 1 5) AS DISTINCT !!!
 (define (identify-list some-list)
   (let ((pivot (car some-list))
 	(second (cadr some-list))
 	(third (caddr some-list)))
-    (cond ((= pivot second)
-	   (if (= pivot third)
-	     `triplet ; then all elements are equal, this won't be interesting when it comes time for a solution
-	     `1,2-dup)) ; list of the form (a a b)
-	  ((= second third)
-	   `2,3-dup) ; the most common case, besides distinct (a b b)
+    (cond ((= second third)
+	   (if (= pivot second)
+	     triplet-map
+	     2,3-dup-map))
+	  ((= pivot second)
+	   1,2-dup-map)
 	  (else
-	    `distinct))))
+	   distinct-map))))
 
-	   
-	     
-(define populate-list
-  (lambda (seed-list)
-    (let ((pivot (car seed-list))
-	  (2nd (cadr seed-list))
-	  (3rd (caddr seed-list)))
-      (cond ((= pivot 2nd)
-	     (if (= pivot 3rd)
-	       `() ; then we have a triplet, so we'll ignore it and return the empty list
-	       (generate-from-seed seed-list 1,2-dup-map))) ; then we only have the 1st two integers as duplicates, with the third one distinct. return the list we want
-	    ((= 2nd 3rd)
-	     (generate-from-seed seed-list 2,3-dup-map))
-	    (else
-	      (generate-from-seed seed-list distinct-map))
-	    ))))
-
+;; given a list, get the map identify-list returns, apply generate-from-seed onto the list
+(define (populate-list some-list)
+  (generate-from-seed some-list (identify-list some-list)))
 
 
 ;; these two functions are used by populate-list to generate a list of attempts, based on the type of attempt family (1,2-dup, 2,3-dup, all distinct, etc.)
 (define (multiply-two-lists list1 list2)
   (map * list1 list2))
 
+;; given a 3-list and a list of 3-lists, apply multiply-two-lists to each list in the list of 3-lists
+;; could probably come up with better variable names
 (define (generate-from-seed seed-list list-of-lists)
   (map (lambda (list-from-listol)
 	 (multiply-two-lists seed-list list-from-listol))
@@ -152,3 +141,6 @@
     (-1 1 1)
     (1 -1 -1)))
     
+(define triplet-map
+  `())
+
