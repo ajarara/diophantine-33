@@ -74,8 +74,9 @@
 ;; the above is an infinite loop until handle-input is called, so let's define handle-input. state is a list of all the params we had with try-until-input
 (define (handle-input signal state)
   (cond ((eq? signal `c)
-	 (verbose-lump-attempt (caddr state) (cadr state))
-	 (apply try-until-input state)) ; print out an attempt, then resume whatever we were doing. we could turn off verbosity, but that will complicate things. we could also use the increment procedure, since we tested the procedure, but that will also complicate things.
+	 (begin (verbose-lump-attempt (caddr state) (cadr state))
+	        (apply try-until-input state))) ; print out an attempt, then resume whatever we were doing. we could turn off verbosity, but that will complicate things. we could also use the increment procedure, since we tested the procedure, but that will also complicate things.
+	; how do I do this shit
 	((eq? signal `q)
 	 (display (format #f "Execution halted at ~a" (caddr state))))
 	(else
