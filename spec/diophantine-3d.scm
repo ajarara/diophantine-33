@@ -51,6 +51,23 @@
 	 ))
 
 
+(suite "sum-list takes a list of numbers and returns its sum"
+       (tests
+	 (test "works for trivial list"
+	       e
+	       (assert-equal 0
+			     (sum-list `(0 0 0))))
+	 (test "works for lists with positive elements"
+	       e
+	       (assert-equal 15
+			     (sum-list `(1 2 3 4 5))))
+	 (test "works for lists with negative elements"
+	       e
+	       (assert-equal -22
+			     (sum-list `(-1 4 5 -30))))
+	 ))
+
+
 (suite "cube-list supersizes our lists"
        (tests
 	 (test "works with trivial list"
@@ -66,6 +83,7 @@
 	       (assert-equal `(27 125 216)
 			     (cube-list `(3 5 6))))
 	 ))
+
 
 (suite "identify-list suite"
        (tests

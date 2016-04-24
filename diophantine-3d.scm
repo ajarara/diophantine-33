@@ -1,4 +1,5 @@
-﻿;; need this for our control mechanism, will possibly move this out to some other file someday
+﻿(display "dio-3d loaded")
+;; need this for our control mechanism, will possibly move this out to some other file someday
 (use-modules (rnrs io ports))
 
 ;; needed entirely for the fold proc
@@ -7,6 +8,8 @@
 ;; instead, we can just enumerate through tuples, being careful to avoid repeats.
 ;; the way we do this is by constructing a list, like below
 ;;
+;; (1 0 0)
+;; (1 1 0)
 ;; (1 1 1)
 ;;
 ;; then this 'shell' of potential solutions has been exhausted, and we move on to the next one
@@ -61,11 +64,13 @@
            
 
 
-;; given a guess, check to see if the sum of the elements in the guess is equal to the value in question
-;; not sure if I need this...
-(define (check-for-solution guess value-in-question)
-  (= (apply + guess)
-     value-in-question))
+
+;; given a list, sum the elements
+(define (sum-list some-list)
+  (if (null? some-list)
+    0
+    (+ (car some-list) (sum-list (cdr some-list)))))
+
 
 ;; this however, I do need
 ;; given a list, construct a new list with each element cubed
@@ -75,6 +80,12 @@
       (expt number 3))
     some-list))
 
+(define (cbrt-list some-list)
+  (map
+    (lambda (number)
+      (inexact->exact
+	(expt number 1/3)))
+    some-list))
 
 ;; given a 3-multiset (as defined by GSL), we want to generate all combinations of negative and positive entries. we need to identify the type of the multiset, and then call the appropriate generating function
 ;; there are only 3 cases we should be handling:
@@ -143,3 +154,4 @@
   (let ((list-map (identify-list some-list))
 	(cubed-list (cube-list some-list)))
     (generate-from-list cubed-list list-map)))
+
