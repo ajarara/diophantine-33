@@ -1,5 +1,4 @@
-﻿(display "dio-3d loaded")
-;; need this for our control mechanism, will possibly move this out to some other file someday
+﻿;; need this for our control mechanism, will possibly move this out to some other file someday
 (use-modules (rnrs io ports))
 
 ;; needed entirely for the fold proc

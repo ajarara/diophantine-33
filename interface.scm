@@ -55,7 +55,7 @@
 
 (define (try-until-input list-procedure compared-value current-list inc-list)
   (cond ((char-ready? input-port)
-	 (handle-input (read-char input-port)
+	 (handle-input (read input-port)
 		       (list list-procedure
 			     compared-value
 			     current-list
