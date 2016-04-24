@@ -42,17 +42,16 @@
 	(quiet-attempt attempt compared-num))
       attempt-list)))
 
+
 (define input-port (current-input-port))
 
-;; this is a relatively big function. it checks an input port for input. if there isn't any, it applies a lump-attempt to the list passed, and checks if the result is true. if not, it tries again.
+;; big function. given parameters, check for input on the input-port (above) apply the list-procedure to the current list, with the comparison, then if it returns false, try again with a new list as defined by inc-list
 ;; parameters are: 
 ;; a procedure that takes a list and a value and returns a boolean
 ;; the value (applied to the above proc)
 ;; a list
 ;; a procedure that takes a list and returns a new one (that can also be applied to this proc)
 ;; needs to also take an input/output port. wondering if that's a performance hit.
-
-
 (define (try-until-input list-procedure compared-value current-list inc-list)
   (cond ((char-ready? input-port)
 	 (handle-input (read input-port)
@@ -69,16 +68,13 @@
 	    (inc-list current-list)
 	    inc-list)))) ; try again with another list
 
-;; hey that wasn't too bad...
-
 ;; the above is an infinite loop until handle-input is called, so let's define handle-input. state is a list of all the params we had with try-until-input
 (define (handle-input signal state)
   (cond ((eq? signal `c)
 	 (begin (verbose-lump-attempt (caddr state) (cadr state))
 	        (apply try-until-input state))) ; print out an attempt, then resume whatever we were doing. we could turn off verbosity, but that will complicate things. we could also use the increment procedure, since we tested the procedure, but that will also complicate things.
-	; how do I do this shit
 	((eq? signal `q)
-	 (display (format #f "Execution halted at ~a" (caddr state))))
+	 (display (format #f "Execution halted at ~a\n" (caddr state))))
 	(else
 	  (display helpstring)
 	  (apply try-until-input state))))
