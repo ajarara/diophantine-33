@@ -31,6 +31,11 @@
 (define (upper-mod number)
   (- 2 (remainder number 2)))
 
+;; we're solving for the solution, always. if you want to apply this program to another number, you can do so, but the incrementing procedure and the list maps are tuned to find solutions specifically for 33
+(define solution
+  33)
+
+
 ;; here's where most of the 'optimization' is.
 ;; What is embodied here:
 ;;   if there is a solution to our problem w.r.t 33, then
