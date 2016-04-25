@@ -20,4 +20,4 @@
 
 (format #t "Starting with ~a\n" input-args)
 ;; here we go!
-(try-until-input quiet-lump-attempt 33 input-args increment-3-pivot-list)
+(silent-try-until-input input-args)
