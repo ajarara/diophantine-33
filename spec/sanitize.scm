@@ -20,4 +20,12 @@
 	       e
 	       (assert-true
 		 (error? (sanitize `(9 1 -1)))))
+	 (test "sanitize exits when supplied a valid list in the incorrect order"
+	       e
+	       (assert-true
+		 (error? (sanitize `(101 50 70)))))
+	 (test "sanitize exits with error when supplied a list with 2nd and 3rd numbers being diff parity"
+	       e
+	       (assert-true
+		 (error? (sanitize `(9 3 2)))))
 	 ))

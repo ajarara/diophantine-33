@@ -1,12 +1,12 @@
 ;; need a way to sanitize dirty user input
 (define (sanitize some-list)
+  (if (not (= 3
+	      (length some-list)))
+    (error "incorrect number of entries in given list: " some-list))
   (let ((pivot (car some-list))
 	(second (cadr some-list))
 	(third (caddr some-list)))
-    (cond ((not (= 3
-	      (length some-list)))
-	   (error "incorrect number of entries in given list: " some-list))
-	  ((not
+    (cond ((not
 	     (and-map
 	       (lambda (entry)
 		 (integer? entry))
@@ -19,5 +19,9 @@
 	       (> 0 number))
 	     some-list)
 	   (error "no numbers should be negative!" some-list))
-	  (else
-	    #t))))
+	  ((or (< second third) (< pivot second))
+	   (error "numbers should be in strictly decreasing order" some-list))
+	  ((not (= (remainder second 2)
+		   (remainder third 2)))
+	   (error "the second and third entries are not the same parity!" some-list))
+	  )))
