@@ -35,6 +35,26 @@
 	(verbose-attempt attempt))
       attempt-list)))
 
+
+;; given a list, display the result of the attempt ONLY if it is between the interval [-epsilon, +epsilon]
+
+(define epsilon 100)
+(define (semi-verbose-attempt cubed-list)
+  (let ((result (sum-list cubed-list)))
+    (if (> epsilon
+	   (abs result))
+      (display (format #f "Trying ~a yields ~a\n" cubed-list result)))
+    (= result solution)))
+
+(define (semi-verbose-lump-attempt root-list)
+  (let ((attempt-list (list-generate root-list)))
+    (find
+      (lambda (attempt)
+	(semi-verbose-attempt attempt))
+      attempt-list)))
+
+
+
 ;; quiet calculation
 ;; sum-list is sourced from dio-3d
 (define (silent-attempt some-list)
@@ -86,6 +106,16 @@
 	  (verbose-try-until-input
 	    (increment-3-pivot-list current-list)))))
 
+;; given a list, only display its result if the result falls under the defined epsilon. the epsilon is defined immediately above semi-verbose-attempt
+(define (semi-verbose-try-until-input current-list)
+  (cond ((char-ready? input-port)
+	 (handle-input current-list))
+	((semi-verbose-lump-attempt current-list)
+	 (display (victorystring current-list)))
+	(else
+	  (semi-verbose-try-until-input
+	    (increment-3-pivot-list current-list)))))
+
 ;; silent try-until-input loop.
 (define (silent-try-until-input current-list)
   (cond ((char-ready? input-port)
@@ -115,6 +145,7 @@
     (list `v verbose-try-until-input)
     (list `c one-off-loop)
     (list `q silent-try-until-input)
+    (list `e semi-verbose-try-until-input)
 ))
 
 
@@ -135,8 +166,8 @@
 ;; only gets called when char-ready? on input port holds true, so there should be no hanging
 (define (handle-input state)
   (let ((signal (read input-port)))
-    (display (format #f "Signal: ~a : with state: ~a\n" signal state))
+    (drain-input input-port) ; annoying that I have to put this here...
     (let ((proc (find-proc-from-signal signal)))
       (if proc
-	proc
+	(proc state)
 	(help-me state)))))
