@@ -44,15 +44,6 @@
 	 ))
 
 
-
-=======
-	       (assert-false (verbose-attempt `(5 25 -25))))
-	 (test "silent-attempt spits out true when it should"
-	       e
-	       (assert-true (verbose-attempt `(10 25 -2))))
-	 ))
-
->>>>>>> c1d64062c0ddc6aef2eb3ee08c5c0ef4c5a0b247
 (suite "victorystring testing suite"
        (tests
 	 (test "If this fails, solution might've been changed."

@@ -107,7 +107,6 @@
 	  (verbose-try-until-input
 	    (increment-3-pivot-list current-list)))))
 
-<<<<<<< HEAD
 ;; given a list, only display its result if the result falls under the defined epsilon. the epsilon is defined immediately above semi-verbose-attempt
 (define (semi-verbose-try-until-input current-list)
   (cond ((char-ready? input-port)
@@ -151,14 +150,6 @@
 ))
 
 
-;; mapping of signals to procedures. all of these procedures check for input every time they're run, and call themselves.
-(define signal-proc-pairing
-  (list
-    (list `c one-off-loop)
-    (list `v verbose-try-until-input)
-    (list `q silent-try-until-input)
-))
-
 (define (search-signal-proc-pairing signal)
   (find
     (lambda (signal-proc-pair)
@@ -167,9 +158,9 @@
     signal-proc-pairing))
 
 (define (find-proc-from-signal signal)
-  (let ((proc (search-signal-proc-pairing signal)))
-    (if proc
-      (cadr proc)
+  (let ((proc-pair (search-signal-proc-pairing signal)))
+    (if proc-pair
+      (cadr proc-pair)
       #f)))
 
 ;; only gets called when char-ready? on input port holds true, so there should be no hanging
