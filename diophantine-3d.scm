@@ -153,6 +153,7 @@
 (define triplet-map
   `())
 
+
 ;; given a 3-list, get the associated list-map, cube the elements, and apply the list-map to the elements
 (define (list-generate some-list)
   (let ((list-map (identify-list some-list))

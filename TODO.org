@@ -1,0 +1,15 @@
+* TODO Implement 33 modulus
+There is an algorithm, that given a number k, and n, generates all numbers such that n of them add up to k. IE for k = 10, n = 3:
+
+bonus if you can do it in terms of expt modulo
+
+1,1,7
+1,2,8
+1,3,6
+1,4,5
+1,5,4 (i guess barring permutations)
+etc...
+
+What this will do is completely eliminate any efficiency in terms of " oh this isn't even odd! "
+
+Unfortunately, the reason this project is abandoned right now is that this solution still won't solve the fundamental problem: We need a linear time algorithm to get anywhere near 10^14.

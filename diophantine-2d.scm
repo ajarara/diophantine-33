@@ -1,4 +1,4 @@
-;; describing the system of enumeration:
+;; DESCRIBING the system of enumeration:
 ;; Cantor's enumeration works great if you want to enumerate through all
 ;; possible pairings of numbers, however it repeats values if you're
 ;; considering sets of certain numbers of a certain size (in this file's case,
