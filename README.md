@@ -100,8 +100,10 @@ This allows us to break up our pivot lists into different types and draw reasona
 
 ## An Alternate Algorithm
 Alluded to before, if you cube the equivalence representatives of mod 33, they all map to different values.
-
+``` bash
 guile -l side/modulo.scm
+```
+
 ``` scheme
 > (prettyprint 3 33) ; exponent, modulus
 (32 32)
@@ -142,4 +144,6 @@ guile -l side/modulo.scm
 Note the bijection, again, as mentioned before.
 
 Then you enumerate all the weak 3-decompositions of 33 (much easier said than done). These are the residues you are looking for. Perform a reverse map, and if there is a solution, it has to be of one of these forms. The additional optimizations above can also be considered, although they sadly do not a linear algorithm make.
+
+Enumeration through these are simple. Save the decompositions as a map, and enumerate through 3-space (any isomorphism between R and R^2 works here), subject it to the same restrictions as above and you've got a much more efficient search, albeit still growing in O(N^3) time.
 
