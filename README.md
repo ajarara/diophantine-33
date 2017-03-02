@@ -33,7 +33,7 @@ This code was an attempt to find that solution, until I got a first hand account
 
 Initially me and my complex analysis professor stripped out lots of values pertaining to the parity (only two or none may be even, for example). But asking my graph theory professor uncovered something rather pertinent, that you can eliminate most trials by realizing any integer cubed mod 33 has the same residue as everything in its equivalence class (which I guess is obvious when you say it that way, but I do recall spending some time proving it). That's not the case for all numbers, and it clearly isn't the case for prime moduli, as modular arithmetic tends to like. That prompted code in ./side looking for smooth residue profiles (probably the strangest name I've written for a function yet).
 
-Anyway, while I found exploration of that aspect interesting, for example there is a bijection between equivalence classes and their residues cubed, raised to the ninth, and generally, raised to the 3^n mod 33, it _still_ isn't a linear time algorithm. The mathematician in the video had checked everything under 10^14. Either there is a linear time algorithm or he has one sick compute cluster. I could not get anywhere close to that on a single Debian VPS.
+Anyway, while I found exploration of that aspect interesting, for example there is a bijection between equivalence classes and their residues cubed, raised to the ninth, and generally, raised to the 3^n mod 33, it _still_ isn't a linear time algorithm. The mathematician in the video had checked everything under 10^14. Either there is a linear time algorithm or he has one _sick_ compute cluster. I could not get anywhere close to that on a single Debian VPS.
 
 But of course writing this taught me a lot. After a while, I wanted to watch my algorithm in action, and I wrote in some non-blocking code (when I really should've been looking for a concurrency module) to check for activity in stdin. That way I could monitor progress. I remember being giddy showing my math professor how fast it threw out numbers to stdout.
 
@@ -45,7 +45,8 @@ guile -l main.scm
 Inputting 'v' and hitting enter causes verbose output to occur, every try and the results.
 
 Here is an example of what verbose output looks like:
-![You don't know how many processor cycles I had to spend to get this image][https://raw.githubusercontent.com/alphor/diophantine-33/master/33.png]
+
+![You don't know how many processor cycles I had to spend to get this image](https://raw.githubusercontent.com/alphor/diophantine-33/master/33.png)
 
 To end verbose output, use "c", and hit enter. It will instead display a final computation, and resume intended functionality converting your computer to a very inefficient space heater.
 
