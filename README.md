@@ -37,6 +37,20 @@ Anyway, while I found exploration of that aspect interesting, for example there 
 
 But of course writing this taught me a lot. After a while, I wanted to watch my algorithm in action, and I wrote in some non-blocking code (when I really should've been looking for a concurrency module) to check for activity in stdin. That way I could monitor progress. I remember being giddy showing my math professor how fast it threw out numbers to stdout.
 
+# Usage
+``` bash
+guile -l main.scm 
+```
+(Provided you've cloned the repo, and have guile installed).
+Inputting 'v' and hitting enter causes verbose output to occur, every try and the results.
+
+Here is an example of what verbose output looks like:
+![You don't know how many processor cycles I had to spend to get this image][./33.png]
+
+To end verbose output, use "c", and hit enter. It will instead display a final computation, and exit.
+
+There isn't a way to serialize output, that was planned but never implemented. Instead, you can feed input to it just as you would on the command line. Main will sanitize the inputs to make sure they are right (the 'rules' are in sanitize.scm, requiring pivot to be even, some parity checks, etc), and if not, exit. Otherwise it'll chug along at what you feed it.
+
 # Plans for a rewrite
 It's not likely.
 
@@ -44,6 +58,8 @@ As I was going through SICP at the time, I was (and still am) enamored with tail
 
 If I were to rewrite this, I would absolutely do it in Racket, specifically because their docs on concurrency are very clear over Guile's. I don't intend to use concurrency for speed or threading, instead I would use it to provide a sane interface to the program state. 
 
-In order to 'see' it, though, I'd have to deposit the last set of trials in some shared state, which as far as I can tell can't be done functionally. Perhaps I'd even do it in Python, instead.
+In order to 'see' it, though, I'd have to deposit the last set of trials in some shared state, which as far as I can tell can't be done functionally, or definitely not the way I did it here. Perhaps I'd even do it in Python, instead.
 
 However there really is no reason to write this over if I do not have a linear time algo. I think about it from time to time, and sometimes I fill a page with thoughts and hopes, but so far I haven't cracked it. Maybe someday :)
+
+

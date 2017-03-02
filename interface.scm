@@ -7,7 +7,6 @@
   "Incorrect command. Currently supported commands are:
   \tc : display where we're at
   \tv : toggle verbosity, at the cost of slowing down
-  \tw : write the results of the next try to file, and quit
   \tanything else: display this message. It's free!\n")
 
 
