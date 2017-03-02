@@ -99,4 +99,47 @@ This allows us to break up our pivot lists into different types and draw reasona
   
 
 ## An Alternate Algorithm
-wip
+Alluded to before, if you cube the equivalence representatives of mod 33, they all map to different values.
+
+guile -l side/modulo.scm
+``` scheme
+> (prettyprint 3 33) ; exponent, modulus
+(32 32)
+(31 25)
+(30 6)
+(29 2)
+(28 7)
+(27 15)
+(26 20)
+(25 16)
+(24 30)
+(23 23)
+(22 22)
+(21 21)
+(20 14)
+(19 28)
+(18 24)
+(17 29)
+(16 4)
+(15 9)
+(14 5)
+(13 19)
+(12 12)
+(11 11)
+(10 10)
+(9 3)
+(8 17)
+(7 13)
+(6 18)
+(5 26)
+(4 31)
+(3 27)
+(2 8)
+(1 1)
+(0 0)
+```
+
+Note the bijection, again, as mentioned before.
+
+Then you enumerate all the weak 3-decompositions of 33 (much easier said than done). These are the residues you are looking for. Perform a reverse map, and if there is a solution, it has to be of one of these forms. The additional optimizations above can also be considered, although they sadly do not a linear algorithm make.
+
