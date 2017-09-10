@@ -1,7 +1,7 @@
 # Diophantine-33
 Inspired by [this numberphile video](https://www.youtube.com/watch?v=wymmCdLdPvM), this project was one of my first strange excursions into functional programming.
 
-The aim of the game was to iterate through 3-space as efficiently as possible (please hold your eyerolls within the vehicle for the duration of the ride), trying to find the solution to this equation:
+The aim of the game was to iterate through 3-space as efficiently as possible trying to find the solution to this equation:
 
 ``` math
 a^3 + b^3 + c^3 = 33
@@ -86,15 +86,15 @@ $1 = ((125 -27 -1) (-125 27 -1) (125 27 -1) (125 -27 1) (-125 27 1))
 ```
 
 This allows us to break up our pivot lists into different types and draw reasonable conclusions about them, allowing us to save some computation when we identify them:
- - For all possible pivot lists:
+ For all possible pivot lists:
   - there are no solutions of all negative and all positive signs.
- - For ones that are all distinct: ```(5 3 1)```
+ For ones that are all distinct: ```(5 3 1)```
   - Since we know the pivot is >= the rest of the list, we don't need to map to (-1 -1 1), since that would be a negative value.
- - For ones that have their 1st and 2nd as duplicates: ```(5 5 3)```
+ For ones that have their 1st and 2nd as duplicates: ```(5 5 3)```
   - There is no way that the signs of the first two differ when cubed, as they'd cancel each other out, giving us the integer cube root of 33, which doesn't exist.
- - For ones that have their 2nd and 3rd as duplicates: ```(5 1 1)```
+ For ones that have their 2nd and 3rd as duplicates: ```(5 1 1)```
   - Analogous to the above, except signs of the last two cannot differ here.
- - For ones that are triplets, where all are the same value
+ For ones that are triplets, where all are the same value
   - They're never a solution :(
   
 
@@ -147,3 +147,6 @@ Then you enumerate all the weak 3-decompositions of 33 (much easier said than do
 
 Enumeration through these are simple. Save the decompositions as a map, and enumerate through 3-space (any isomorphism between R and R^2 works here), subject it to the same restrictions as above and you've got a much more efficient search, albeit still growing in O(N^3) time.
 
+Yet another approach is the heuristic one. Given any attempt, adding or subtracting 1 from any of the numbers affects the sum specifically. An attempt to only choose increments that approached 33 or minimized deviation from it would be a linear search (and such a search would be deterministic given a constant min deviation function). This is slightly more complicated, but for example:
+
+Say you have 5^3 + 5^3 - 6^3 = 34. Adding 1 to either of the 5s jumps from 1 off the solution to 91 off. But subtracting 1 from the 5s yields a solution that is only 60 off (although negative). So subtract 1, and repeat, keeping track of previous tries.
