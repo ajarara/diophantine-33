@@ -85,15 +85,25 @@ $1 = ((125 -27 -1) (-125 27 -1) (125 27 -1) (125 -27 1) (-125 27 1))
 ```
 
 This allows us to break up our pivot lists into different types and draw reasonable conclusions about them, allowing us to save some computation when we identify them:
+
  For all possible pivot lists:
+ 
   - there are no solutions of all negative and all positive signs.
+  
  For ones that are all distinct: ```(5 3 1)```
+ 
   - Since we know the pivot is >= the rest of the list, we don't need to map to (-1 -1 1), since that would be a negative value.
+  
  For ones that have their 1st and 2nd as duplicates: ```(5 5 3)```
+ 
   - There is no way that the signs of the first two differ when cubed, as they'd cancel each other out, giving us the integer cube root of 33, which doesn't exist.
+  
  For ones that have their 2nd and 3rd as duplicates: ```(5 1 1)```
+ 
   - Analogous to the above, except signs of the last two cannot differ here.
+  
  For ones that are triplets, where all are the same value
+ 
   - They're never a solution :(
   
 
