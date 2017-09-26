@@ -25,8 +25,7 @@ Every integer, when cubed, has a residue of 1, 0, or 8 modulo 9 (the proof of th
 
 So we know for a fact there is no integer solution to 4, 5, 13, 14, 22, 23.. as these are all of the form we just stated.
 
-But 33 isn't of that form. No one has found a proof that 33 has a solution.
-But no one has found such a proof for 33, or a solution for it.
+But 33 isn't of that form. No one has found a proof either way concerning the existence of a solution for 33.
 
 # Motive for this repo
 This code was an attempt to find that solution, until I got a first hand account of how algorithms like the one encoded here scale: traversing R^3 is terribly unexciting after the first cube of 10,000.
@@ -58,7 +57,7 @@ It's not likely.
 
 As I was going through SICP at the time, I was (and still am) enamored with tail call optimization. Everything in here tries to embody that, even the interface is tail call optimized, in that every call to display something also carries state with it, which is eventually passed back to silent, traditional computing.
 
-If I were to rewrite this, I would absolutely do it in Racket, specifically because their docs on concurrency are very clear over Guile's. I don't intend to use concurrency for speed or threading, instead I would use it to provide a sane interface to the program state. 
+If I were to rewrite this, I would absolutely do it in Racket, specifically because their docs on concurrency are very clear over Guile's. I don't intend to use concurrency for speed or threading, instead I would use it to provide a clear interface to the program state. 
 
 In order to 'see' it, though, I'd have to deposit the last set of trials in some shared state, which as far as I can tell can't be done functionally, or definitely not the way I did it here. Perhaps I'd even do it in Python, instead.
 
