@@ -152,7 +152,7 @@ guile -l side/modulo.scm
 
 Note the bijection, again, as mentioned before.
 
-Then you enumerate all the weak 3-decompositions of 33 (much easier said than done). These are the residues you are looking for. Perform a reverse map, and if there is a solution, it has to be of one of these forms. The additional optimizations above can also be considered, although they sadly do not a linear algorithm make.
+Then you enumerate all the weak 3-decompositions of 33 (I took the liberty of solving this [in python](https://github.com/alphor/python-33), for all integers). These are the residues you are looking for. Perform a reverse map, and if there is a solution, it has to be of one of these forms. The additional optimizations above can also be considered, although they sadly do not a linear algorithm make.
 
 Enumeration through these are simple. Save the decompositions as a map, and enumerate through 3-space (any isomorphism between R and R^2 works here), subject it to the same restrictions as above and you've got a much more efficient search, albeit still growing in O(N^3) time.
 
