@@ -66,7 +66,7 @@ However there really is no reason to write this over if I do not have a linear t
 
 # Technical details
 
-Traversing 3-space is kinda like using [Cantor's diagonalization argument](https://en.wikipedia.org/wiki/Cantor's_diagonal_argument), except I couldn't find an easy way to map the integers to traversal. More on this at the end.
+Traversing 3-space is kinda like using [Cantor's pairing function](https://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function), except I couldn't find an easy way to map the integers to traversal. More on this at the end.
 
 ## Pivot lists
 The algorithm uses exclusively 3 tuples, where each element is lesser than the previous. This removes the possibility that we hit the same equation twice, that is: 5^3 + 3^3 + 2^3 is the same as 3^3 + 5^3 + 2^3, so there is no sense in checking both. We call these 3 tuples pivot lists. The function increment-3-pivot-list takes in a pivot list, and returns the next one in such a way that every possible pivot list is returned exactly once.
